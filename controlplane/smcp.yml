@@ -1,0 +1,151 @@
+apiVersion: maistra.io/v2
+kind: ServiceMeshControlPlane
+metadata:
+  name: basic
+  namespace: istio-system
+spec:
+  tracing:
+    sampling: 10000
+    type: Jaeger
+  proxy:
+    runtime:
+      container:
+        resources:
+          limits:
+            cpu: 300m
+            memory: 512Mi
+          requests:
+            cpu: 20m
+            memory: 64Mi
+      readiness:
+        rewriteApplicationProbes: true
+  gateways:
+    egress:
+      namespace: istio-gateway
+      enabled: false
+      runtime:
+        container:
+          resources:
+            limits:
+              cpu: 2
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+        deployment:
+          autoScaling:
+            enabled: true
+            maxReplicas: 5
+            minReplicas: 2
+            targetCPUUtilizationPercentage: 85
+      service: {}
+    ingress:
+      namespace: istio-gateway
+      enabled: false
+      runtime:
+        container:
+          resources:
+            limits:
+              cpu: 2
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+#       pod:
+#         nodeSelector:
+#           kubernetes.io/hostname: zcloud-dev-8gbw4-worker-westeurope1-78spk
+        deployment:
+          autoScaling:
+            enabled: true
+            maxReplicas: 5
+            minReplicas: 2
+            targetCPUUtilizationPercentage: 85
+      service: {}
+    additionalEgress:
+      other-egress:
+        namespace: istio-gateway
+        enabled: false
+        runtime:
+          container:
+            resources:
+              limits:
+                cpu: 2
+                memory: 1Gi
+              requests:
+                cpu: 100m
+                memory: 128Mi
+          deployment:
+            autoScaling:
+              enabled: true
+              maxReplicas: 5
+              minReplicas: 2
+              targetCPUUtilizationPercentage: 85
+        service:
+          metadata:
+            labels:
+              istio: other-egressgateway
+    additionalIngress:
+      other-ingress:
+        namespace: istio-gateway
+        enabled: false
+        runtime:
+          container:
+            resources:
+              limits:
+                cpu: 2
+                memory: 1Gi
+              requests:
+                cpu: 100m
+                memory: 128Mi
+          deployment:
+            autoScaling:
+              enabled: true
+              maxReplicas: 5
+              minReplicas: 2
+              targetCPUUtilizationPercentage: 85
+        service:
+          metadata:
+            labels:
+              istio: other-ingressgateway
+  policy:
+    type: Istiod
+  addons:
+    grafana:
+      enabled: true
+    jaeger:
+      name: jaeger
+      install:
+        storage:
+          type: Memory
+    kiali:
+      enabled: true
+      install:
+        service:
+          ingress:
+            enabled: true
+    prometheus:
+      enabled: true
+  version: v2.0
+  runtime:
+    components:
+      pilot:
+#       pod:
+#          nodeSelector:
+#            kubernetes.io/hostname: zcloud-dev-8gbw4-worker-westeurope1-78spk       
+        container:
+          resources:
+            limits:
+              cpu: 2
+              memory: 1Gi
+            requests:
+              cpu: 500m
+              memory: 256Mi
+        deployment:
+          autoScaling:
+            enabled: true
+            maxReplicas: 5
+            minReplicas: 2
+            targetCPUUtilizationPercentage: 85
+  telemetry:
+    type: Istiod
+
