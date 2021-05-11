@@ -1,0 +1,47 @@
+# https://istio.io/latest/docs/reference/config/networking/virtual-service/#HTTPRetry
+# https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/router_filter
+#
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: productpage-retry-status-codes
+  namespace: bookinfo
+spec:
+  workloadSelector:
+    labels:
+      app: productpage
+  configPatches:
+  - applyTo: HTTP_ROUTE
+    match:
+      context: SIDECAR_OUTBOUND
+      routeConfiguration:
+        vhost:
+          name: "productpage.bookinfo.svc.cluster.local:80"
+    patch:
+      operation: MERGE
+      value:
+        route:
+          retry_policy:
+            retry_back_off:
+              base_interval: 50ms
+            retriable_status_codes:
+            - 402
+            - 403
+
+---
+
+piVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: productpage-vs
+  namespace: bookinfo
+spec:
+  hosts:
+  - productpage.svc.cluster.local
+  http:
+  - route:
+    - destination:
+        host: productpage
+    retries:
+      attempts: 2
+      retryOn: 5xx,retriable-status-codes
