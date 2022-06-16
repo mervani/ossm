@@ -53,7 +53,7 @@ spec:
               memory: 128Mi
 #       pod:
 #         nodeSelector:
-#           kubernetes.io/hostname: zcloud-dev-8gbw4-worker-westeurope1-78spk
+#           kubernetes.io/hostname: <hostname>
         deployment:
           autoScaling:
             enabled: true
