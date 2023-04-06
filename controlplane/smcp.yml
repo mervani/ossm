@@ -3,6 +3,8 @@ kind: ServiceMeshControlPlane
 metadata:
   name: basic
   namespace: istio-system
+  labels:
+    ossm: "true"
 spec:
   tracing:
     sampling: 10000
