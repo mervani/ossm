@@ -131,7 +131,7 @@ spec:
       pilot:
 #       pod:
 #          nodeSelector:
-#            kubernetes.io/hostname: zcloud-dev-8gbw4-worker-westeurope1-78spk       
+#            kubernetes.io/hostname: abc
         container:
           resources:
             limits:
